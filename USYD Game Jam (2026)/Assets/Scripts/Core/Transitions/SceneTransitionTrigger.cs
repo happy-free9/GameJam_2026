@@ -81,9 +81,7 @@ public class SceneTransitionTrigger : MonoBehaviour, IInteractable
 
     public bool CanInteract(PlayerInteractor interactor)
     {
-        return isActiveAndEnabled &&
-            !string.IsNullOrWhiteSpace(targetSceneName) &&
-            !string.IsNullOrWhiteSpace(targetSpawnPointId);
+        return CanTransition();
     }
 
     public string GetPrompt(PlayerInteractor interactor)
@@ -93,13 +91,25 @@ public class SceneTransitionTrigger : MonoBehaviour, IInteractable
 
     public void Interact(PlayerInteractor interactor)
     {
-        if (!CanInteract(interactor))
+        TriggerTransition();
+    }
+
+    public void TriggerTransition()
+    {
+        if (!CanTransition())
         {
             Debug.LogWarning($"SceneTransitionTrigger on '{name}' is missing target scene or spawn point id.", this);
             return;
         }
 
         SceneTransitionManager.Instance?.LoadScene(targetSceneName, targetSpawnPointId);
+    }
+
+    private bool CanTransition()
+    {
+        return isActiveAndEnabled &&
+            !string.IsNullOrWhiteSpace(targetSceneName) &&
+            !string.IsNullOrWhiteSpace(targetSpawnPointId);
     }
 
     public Transform GetTransform()

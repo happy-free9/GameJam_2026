@@ -258,6 +258,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &267167280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 267167282}
+  - component: {fileID: 267167281}
+  m_Layer: 0
+  m_Name: Spawn_FromHotelLobby
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &267167281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267167280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d17d0f89bfeb4623818c84d33b488794, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnPoint
+  spawnPointId: FromHotelLobby
+  gizmoColor: {r: 0, g: 1, b: 0, a: 1}
+--- !u!4 &267167282
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267167280}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &478294605
 GameObject:
   m_ObjectHideFlags: 0
@@ -1008,6 +1054,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1013279178}
   - component: {fileID: 1013279179}
+  - component: {fileID: 1013279180}
   m_Layer: 0
   m_Name: ElevatorInteractionZone
   m_TagString: Untagged
@@ -1076,6 +1123,36 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.5, y: 1.2}
   m_EdgeRadius: 0
+--- !u!114 &1013279180
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1013279177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Call elevator
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1CartFlow, Assembly-CSharp
+        m_MethodName: InspectElevator
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1131517472
 GameObject:
   m_ObjectHideFlags: 0
@@ -1086,6 +1163,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1131517473}
   - component: {fileID: 1131517474}
+  - component: {fileID: 1131517475}
   m_Layer: 0
   m_Name: DepartureCartInteractionZone
   m_TagString: Untagged
@@ -1154,6 +1232,65 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.2, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1131517475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1131517472}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cd690179b8643b48e9c1f873fe43c76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneTransitionTrigger
+  promptText: Choose Departure Cart
+  targetSceneName: Guest1WaitingHallway_XW
+  targetSpawnPointId: FromCartHallway
+--- !u!1 &1140603292
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1140603294}
+  - component: {fileID: 1140603293}
+  m_Layer: 0
+  m_Name: Guest1CartStoryController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1140603293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140603292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9a3663bfda8fb049b68c08bae995b53, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Guest1CartFlow
+--- !u!4 &1140603294
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140603292}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1190737920
 GameObject:
   m_ObjectHideFlags: 0
@@ -1256,6 +1393,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1393393307}
   - component: {fileID: 1393393308}
+  - component: {fileID: 1393393309}
   m_Layer: 0
   m_Name: RoomServiceCartInteractionZone
   m_TagString: Untagged
@@ -1324,6 +1462,36 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.2, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1393393309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1393393306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect Room Service Cart
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1CartFlow, Assembly-CSharp
+        m_MethodName: InspectRoomServiceCart
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1414366374
 GameObject:
   m_ObjectHideFlags: 0
@@ -1539,6 +1707,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1599578262}
   - component: {fileID: 1599578263}
+  - component: {fileID: 1599578264}
   m_Layer: 0
   m_Name: ArrivalCartInteractionZone
   m_TagString: Untagged
@@ -1607,6 +1776,36 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.2, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1599578264
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599578261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect Arrival Cart
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1CartFlow, Assembly-CSharp
+        m_MethodName: InspectArrivalCart
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1634270281
 GameObject:
   m_ObjectHideFlags: 0
@@ -1653,6 +1852,7 @@ GameObject:
   - component: {fileID: 1652249928}
   - component: {fileID: 1652249929}
   - component: {fileID: 1652249930}
+  - component: {fileID: 1652249931}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -1821,6 +2021,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SidePlayerController
   moveSpeed: 4
+--- !u!114 &1652249931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1652249925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6f113fc8c84855ae3946fdff6a17b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+  interactionRange: 3
 --- !u!1 &1709028454
 GameObject:
   m_ObjectHideFlags: 0
@@ -2008,3 +2221,5 @@ SceneRoots:
   - {fileID: 1534828312}
   - {fileID: 1709028455}
   - {fileID: 1634270282}
+  - {fileID: 267167282}
+  - {fileID: 1140603294}

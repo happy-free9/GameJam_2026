@@ -258,6 +258,54 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &267167280
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 267167282}
+  - component: {fileID: 267167281}
+  m_Layer: 0
+  m_Name: CoreUIRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &267167281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267167280}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a892cbca4f2a4ac68c08ee2c828ad795, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoreUIRoot
+  persistAcrossScenes: 1
+  ensureInteractionPrompt: 1
+  ensureObjectivePanel: 1
+  ensureDialoguePanel: 1
+--- !u!4 &267167282
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267167280}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &466499765
 GameObject:
   m_ObjectHideFlags: 0
@@ -668,6 +716,7 @@ GameObject:
   m_Component:
   - component: {fileID: 656434563}
   - component: {fileID: 656434564}
+  - component: {fileID: 656434565}
   m_Layer: 0
   m_Name: UmbrellaInteractionZone
   m_TagString: Untagged
@@ -736,6 +785,36 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
+--- !u!114 &656434565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 656434562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect umbrella
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1LobbyFlow, Assembly-CSharp
+        m_MethodName: CollectUmbrella
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &743659129
 GameObject:
   m_ObjectHideFlags: 0
@@ -1024,6 +1103,7 @@ GameObject:
   m_Component:
   - component: {fileID: 903693762}
   - component: {fileID: 903693763}
+  - component: {fileID: 903693764}
   m_Layer: 0
   m_Name: GlassInteractionZone
   m_TagString: Untagged
@@ -1092,6 +1172,36 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
+--- !u!114 &903693764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 903693761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect glass
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1LobbyFlow, Assembly-CSharp
+        m_MethodName: CollectGlass
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &949331324
 GameObject:
   m_ObjectHideFlags: 0
@@ -1412,6 +1522,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1111912191}
   - component: {fileID: 1111912192}
+  - component: {fileID: 1111912193}
   m_Layer: 0
   m_Name: GoldStrawInteractionZone
   m_TagString: Untagged
@@ -1480,6 +1591,89 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
+--- !u!114 &1111912193
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1111912190}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect gold straw
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1LobbyFlow, Assembly-CSharp
+        m_MethodName: CollectGoldStraw
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!1 &1140603292
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1140603294}
+  - component: {fileID: 1140603293}
+  m_Layer: 0
+  m_Name: Guest1LobbyStoryController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1140603293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140603292}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64660c489fbc7f842a80d0e4bc80bee2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Guest1LobbyFlow
+  glassVisual: {fileID: 603674629}
+  goldStrawVisual: {fileID: 586553600}
+  houseSpecialSyrupVisual: {fileID: 1726876628}
+  umbrellaVisual: {fileID: 602433305}
+  glassInteraction: {fileID: 903693764}
+  goldStrawInteraction: {fileID: 1111912193}
+  houseSpecialSyrupInteraction: {fileID: 1255914750}
+  umbrellaInteraction: {fileID: 656434565}
+  elevatorTransition: {fileID: 1966531435}
+--- !u!4 &1140603294
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140603292}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1161240842
 GameObject:
   m_ObjectHideFlags: 0
@@ -1490,6 +1684,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1161240843}
   - component: {fileID: 1161240844}
+  - component: {fileID: 1161240845}
   m_Layer: 0
   m_Name: Guest1InteractionZone
   m_TagString: Untagged
@@ -1558,6 +1753,36 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1.5}
   m_EdgeRadius: 0
+--- !u!114 &1161240845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1161240842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Talk to Guest 1
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1LobbyFlow, Assembly-CSharp
+        m_MethodName: InteractWithGuest
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1170556388
 GameObject:
   m_ObjectHideFlags: 0
@@ -1608,6 +1833,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1255914748}
   - component: {fileID: 1255914749}
+  - component: {fileID: 1255914750}
   m_Layer: 0
   m_Name: HouseSpecialSyrupInteractionZone
   m_TagString: Untagged
@@ -1676,6 +1902,36 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 0.5}
   m_EdgeRadius: 0
+--- !u!114 &1255914750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1255914747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect syrup
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1140603293}
+        m_TargetAssemblyTypeName: Guest1LobbyFlow, Assembly-CSharp
+        m_MethodName: CollectHouseSpecialSyrup
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1277129123
 GameObject:
   m_ObjectHideFlags: 0
@@ -2186,6 +2442,7 @@ GameObject:
   - component: {fileID: 1652249928}
   - component: {fileID: 1652249929}
   - component: {fileID: 1652249930}
+  - component: {fileID: 1652249931}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2354,6 +2611,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SidePlayerController
   moveSpeed: 4
+--- !u!114 &1652249931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1652249925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6f113fc8c84855ae3946fdff6a17b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+  interactionRange: 3
 --- !u!1 &1726876628
 GameObject:
   m_ObjectHideFlags: 0
@@ -2456,6 +2726,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1966531433}
   - component: {fileID: 1966531434}
+  - component: {fileID: 1966531435}
   m_Layer: 0
   m_Name: ElevatorInteractionZone
   m_TagString: Untagged
@@ -2524,6 +2795,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.2, y: 1.7}
   m_EdgeRadius: 0
+--- !u!114 &1966531435
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1966531432}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cd690179b8643b48e9c1f873fe43c76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneTransitionTrigger
+  promptText: Enter elevator
+  targetSceneName: Guest1CartHallway_XW
+  targetSpawnPointId: FromHotelLobby
 --- !u!1 &2005027222
 GameObject:
   m_ObjectHideFlags: 0
@@ -2770,3 +3056,5 @@ SceneRoots:
   - {fileID: 466499766}
   - {fileID: 1346517853}
   - {fileID: 1170556389}
+  - {fileID: 267167282}
+  - {fileID: 1140603294}

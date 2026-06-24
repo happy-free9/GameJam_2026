@@ -360,6 +360,7 @@ GameObject:
   m_Component:
   - component: {fileID: 259324929}
   - component: {fileID: 259324930}
+  - component: {fileID: 259324931}
   m_Layer: 0
   m_Name: DiningExitInteractionZone
   m_TagString: Untagged
@@ -428,6 +429,21 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.6, y: 1.2}
   m_EdgeRadius: 0
+--- !u!114 &259324931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 259324928}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4cd690179b8643b48e9c1f873fe43c76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneTransitionTrigger
+  promptText: Leave dining room
+  targetSceneName: Guest3HorrorChase_XW
+  targetSpawnPointId: FromDiningRoom
 --- !u!1 &381643385
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,6 +730,7 @@ GameObject:
   m_Component:
   - component: {fileID: 459924080}
   - component: {fileID: 459924081}
+  - component: {fileID: 459924082}
   m_Layer: 0
   m_Name: WaitingRoomEntranceInteractionZone
   m_TagString: Untagged
@@ -782,6 +799,24 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.5, y: 1.2}
   m_EdgeRadius: 0
+--- !u!114 &459924082
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 459924079}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect entrance
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &491986539
 GameObject:
   m_ObjectHideFlags: 0
@@ -2126,6 +2161,52 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
   m_BlendShapeWeights: []
+--- !u!1 &1359385945
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1359385947}
+  - component: {fileID: 1359385946}
+  m_Layer: 0
+  m_Name: Spawn_FromWaitingHallway
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1359385946
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359385945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d17d0f89bfeb4623818c84d33b488794, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnPoint
+  spawnPointId: FromWaitingHallway
+  gizmoColor: {r: 0, g: 1, b: 0, a: 1}
+--- !u!4 &1359385947
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1359385945}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -5, y: -2.3, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1372976255
 GameObject:
   m_ObjectHideFlags: 0
@@ -2528,6 +2609,7 @@ GameObject:
   - component: {fileID: 1652249928}
   - component: {fileID: 1652249929}
   - component: {fileID: 1652249930}
+  - component: {fileID: 1652249931}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2696,6 +2778,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SidePlayerController
   moveSpeed: 4
+--- !u!114 &1652249931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1652249925}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c6f113fc8c84855ae3946fdff6a17b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInteractor
+  interactionRange: 3
 --- !u!1 &1731779408
 GameObject:
   m_ObjectHideFlags: 0
@@ -2810,6 +2905,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1898601394}
   - component: {fileID: 1898601395}
+  - component: {fileID: 1898601396}
   m_Layer: 0
   m_Name: StaffOnlyDoorInteractionZone
   m_TagString: Untagged
@@ -2878,6 +2974,24 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.7, y: 1.1}
   m_EdgeRadius: 0
+--- !u!114 &1898601396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1898601393}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 866611f236b5427e9cff62bbbf12a7d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InteractionTarget
+  activationMode: 0
+  promptText: Inspect staff door
+  disableAfterInteract: 0
+  onInteract:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1983959478
 GameObject:
   m_ObjectHideFlags: 0
@@ -3116,3 +3230,4 @@ SceneRoots:
   - {fileID: 381643387}
   - {fileID: 932165219}
   - {fileID: 491986540}
+  - {fileID: 1359385947}
