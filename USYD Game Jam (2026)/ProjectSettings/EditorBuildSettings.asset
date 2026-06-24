@@ -6,7 +6,29 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/HotelLobby_XW.unity
+    guid: ccdf3ba6d4968264a83da6780452e842
+  - enabled: 1
+    path: Assets/Scenes/Guest1CartHallway_XW.unity
+    guid: f6a8f1bed8d203841894c874a6af0ba3
+  - enabled: 1
+    path: Assets/Scenes/Guest1WaitingHallway_XW.unity
+    guid: 22b0fe5fdd68b5f43869948cd3ba8a8e
+  - enabled: 1
+    path: Assets/Scenes/Guest3DiningRoom_XW.unity
+    guid: 23c856f5cbfa1c843aaffa7a9144e6ad
+  - enabled: 1
+    path: Assets/Scenes/Guest3HorrorChase_XW.unity
+    guid: 5538b84ff0e51034b832a4792507c0a2
+  - enabled: 1
+    path: Assets/Scenes/GoodEnding_XW.unity
+    guid: 975bee919a8bd8144b69c6b3035220f2
+  - enabled: 1
+    path: Assets/Scenes/BadEnding_XW.unity
+    guid: c732a4981948b154d8e4d561a4255371
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
