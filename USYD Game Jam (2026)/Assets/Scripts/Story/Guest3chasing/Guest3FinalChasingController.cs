@@ -9,7 +9,8 @@ public class Guest3FinalChasingController : MonoBehaviour
         RunningToElevator,
         ReachedElevator,
         ShowingOwnerDialogue,
-        BlackScreen
+        BlackScreen,
+        Complete
     }
 
     [Header("Scene References")]
@@ -39,10 +40,13 @@ public class Guest3FinalChasingController : MonoBehaviour
     [SerializeField] private string ownerDialogue = "Hotel Owner:\n“There we are. Safe and sound.”";
     [SerializeField] private float dialogueDelayAfterGuestDisappears = 0.15f;
     [SerializeField] private float dialogueDisplaySeconds = 2.5f;
+    [Tooltip("Leave this off if the ending should stay visible after the dialogue instead of flashing to black.")]
+    [SerializeField] private bool fadeToBlackAfterDialogue = false;
     [SerializeField] private float blackFadeSeconds = 0.75f;
 
     private FinalChaseState state = FinalChaseState.RunningToElevator;
     private Coroutine endingRoutine;
+    private Material runtimeDialogueTextMaterial;
 
     private void Awake()
     {
@@ -111,8 +115,16 @@ public class Guest3FinalChasingController : MonoBehaviour
         }
 
         HideOwnerDialogue();
-        yield return FadeToBlack();
-        state = FinalChaseState.BlackScreen;
+
+        if (fadeToBlackAfterDialogue)
+        {
+            yield return FadeToBlack();
+            state = FinalChaseState.BlackScreen;
+            yield break;
+        }
+
+        HideBlackScreen();
+        state = FinalChaseState.Complete;
     }
 
     private void ShowOwnerDialogue()
@@ -179,15 +191,30 @@ public class Guest3FinalChasingController : MonoBehaviour
         blackScreen.color = color;
     }
 
+    private void HideBlackScreen()
+    {
+        if (blackScreen == null)
+        {
+            return;
+        }
+
+        SetBlackScreenAlpha(0f);
+        blackScreen.gameObject.SetActive(false);
+    }
+
     private void EnsureEndingUi()
     {
         if (endingCanvas == null)
         {
             GameObject canvasObject = new GameObject("Guest3FinalEndingUI");
             endingCanvas = canvasObject.AddComponent<Canvas>();
-            endingCanvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasObject.AddComponent<CanvasScaler>();
+            CanvasScaler scaler = canvasObject.AddComponent<CanvasScaler>();
             canvasObject.AddComponent<GraphicRaycaster>();
+            ConfigureEndingCanvas(endingCanvas, scaler);
+        }
+        else
+        {
+            ConfigureEndingCanvas(endingCanvas, endingCanvas.GetComponent<CanvasScaler>());
         }
 
         if (dialoguePanel == null)
@@ -239,8 +266,8 @@ public class Guest3FinalChasingController : MonoBehaviour
         RectTransform textRect = textObject.AddComponent<RectTransform>();
         textRect.anchorMin = Vector2.zero;
         textRect.anchorMax = Vector2.one;
-        textRect.offsetMin = new Vector2(24f, 14f);
-        textRect.offsetMax = new Vector2(-24f, -14f);
+        textRect.offsetMin = new Vector2(36f, 22f);
+        textRect.offsetMax = new Vector2(-36f, -22f);
 
         Text text = textObject.AddComponent<Text>();
         text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
@@ -253,11 +280,52 @@ public class Guest3FinalChasingController : MonoBehaviour
 
     private void ApplyDialogueTextSettings(Text text)
     {
-        text.fontSize = 26;
+        text.fontSize = 42;
+        text.fontStyle = FontStyle.Bold;
         text.alignment = TextAnchor.MiddleLeft;
         text.color = Color.white;
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
         text.verticalOverflow = VerticalWrapMode.Overflow;
+        text.lineSpacing = 1.05f;
+
+        // Runtime UI.Text can look soft at small sizes; a private point-filtered
+        // material keeps this ending dialogue clearer without changing assets.
+        if (text.font != null && text.material != null)
+        {
+            if (runtimeDialogueTextMaterial == null)
+            {
+                runtimeDialogueTextMaterial = new Material(text.material);
+                if (runtimeDialogueTextMaterial.mainTexture != null)
+                {
+                    runtimeDialogueTextMaterial.mainTexture.filterMode = FilterMode.Point;
+                }
+            }
+
+            text.material = runtimeDialogueTextMaterial;
+        }
+    }
+
+    private void ConfigureEndingCanvas(Canvas canvas, CanvasScaler scaler)
+    {
+        if (canvas == null)
+        {
+            return;
+        }
+
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.pixelPerfect = true;
+
+        if (scaler == null)
+        {
+            scaler = canvas.gameObject.AddComponent<CanvasScaler>();
+        }
+
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+        scaler.matchWidthOrHeight = 0.5f;
+        scaler.referencePixelsPerUnit = 100f;
+        scaler.dynamicPixelsPerUnit = 2f;
     }
 
     private Image CreateBlackScreen(Transform parent)
