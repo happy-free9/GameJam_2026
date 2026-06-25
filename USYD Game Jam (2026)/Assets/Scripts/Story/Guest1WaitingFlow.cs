@@ -9,30 +9,35 @@ public class Guest1WaitingFlow : MonoBehaviour
     [Header("Story Gates")]
     [SerializeField] private SceneTransitionTrigger waitingRoomTransition;
 
-    private bool hasCarriedLuggage;
-
     private void Start()
     {
-        SetObjective("Bring Guest 1's luggage to the Waiting Room.");
-        SetTransitionEnabled(false);
+        DisableHallLuggage();
+        SetObjective("Enter the Dining Room Door.");
+        SetTransitionEnabled(true);
     }
 
     public void InspectPrivateElevator()
     {
-        ShowMessage("The luggage belongs in the Waiting Room.");
+        ShowMessage("Use the Dining Room Door.");
     }
 
     public void CarryLuggage()
     {
-        if (hasCarriedLuggage)
-        {
-            return;
-        }
+        DisableHallLuggage();
+        ShowMessage("Guest 1's luggage is handled through the Lobby and Departure Cart.");
+        SetObjective("Enter the Dining Room Door.");
+        SetTransitionEnabled(true);
+    }
 
-        hasCarriedLuggage = true;
-        ShowMessage("You carry the luggage to the Waiting Room.");
-        SetObjective("Enter Waiting Room.");
+    private void RestoreSuitcaseCollected()
+    {
+        DisableHallLuggage();
+        SetObjective("Enter the Dining Room Door.");
+        SetTransitionEnabled(true);
+    }
 
+    private void DisableHallLuggage()
+    {
         if (luggageVisual != null)
         {
             luggageVisual.SetActive(false);
@@ -42,8 +47,6 @@ public class Guest1WaitingFlow : MonoBehaviour
         {
             luggageInteraction.enabled = false;
         }
-
-        SetTransitionEnabled(true);
     }
 
     private void SetTransitionEnabled(bool enabled)

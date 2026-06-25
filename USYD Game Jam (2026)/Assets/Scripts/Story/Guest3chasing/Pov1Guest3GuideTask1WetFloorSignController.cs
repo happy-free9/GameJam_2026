@@ -184,7 +184,7 @@ public class Pov1Guest3GuideTask1WetFloorSignController : MonoBehaviour
 
         if (SceneExistsInBuildSettings(successSceneName))
         {
-            LoadBuildSettingsScene(successSceneName);
+            SceneTransitionManager.Instance.LoadScene(successSceneName, string.Empty);
             return;
         }
 
@@ -382,16 +382,5 @@ public class Pov1Guest3GuideTask1WetFloorSignController : MonoBehaviour
         }
 
         return false;
-    }
-
-    private void LoadBuildSettingsScene(string sceneName)
-    {
-        if (HotelHungerRuntimeManager.Instance != null)
-        {
-            HotelHungerRuntimeManager.Instance.LoadSceneWithFade(sceneName);
-            return;
-        }
-
-        SceneManager.LoadScene(sceneName);
     }
 }

@@ -186,7 +186,7 @@ public class Pov1Guest3GuideTask2LuggageCartController : MonoBehaviour
 
         if (SceneExistsInBuildSettings(failureSceneName))
         {
-            LoadBuildSettingsScene(failureSceneName);
+            SceneTransitionManager.Instance.LoadScene(failureSceneName, string.Empty);
             return;
         }
 
@@ -216,7 +216,7 @@ public class Pov1Guest3GuideTask2LuggageCartController : MonoBehaviour
 
         if (SceneExistsInBuildSettings(successSceneName))
         {
-            LoadBuildSettingsScene(successSceneName);
+            SceneTransitionManager.Instance.LoadScene(successSceneName, string.Empty);
             return;
         }
 
@@ -420,16 +420,5 @@ public class Pov1Guest3GuideTask2LuggageCartController : MonoBehaviour
         }
 
         return false;
-    }
-
-    private void LoadBuildSettingsScene(string sceneName)
-    {
-        if (HotelHungerRuntimeManager.Instance != null)
-        {
-            HotelHungerRuntimeManager.Instance.LoadSceneWithFade(sceneName);
-            return;
-        }
-
-        SceneManager.LoadScene(sceneName);
     }
 }
