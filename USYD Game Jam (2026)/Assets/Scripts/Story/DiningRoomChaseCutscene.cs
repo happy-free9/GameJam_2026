@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DiningRoomChaseCutscene : MonoBehaviour
 {
@@ -168,15 +169,46 @@ public class DiningRoomChaseCutscene : MonoBehaviour
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(nextSceneName) || string.IsNullOrWhiteSpace(nextSpawnId))
+        if (string.IsNullOrWhiteSpace(nextSceneName))
         {
             Debug.LogWarning(
-                "DiningRoomChaseCutscene was configured to load the next scene, but the scene name or spawn id is empty.",
+                "DiningRoomChaseCutscene was configured to load the next scene, but the scene name is empty.",
                 this);
             return;
         }
 
-        SceneTransitionManager.Instance?.LoadScene(nextSceneName, nextSpawnId);
+        if (!string.IsNullOrWhiteSpace(nextSpawnId))
+        {
+            if (SceneTransitionManager.Instance == null)
+            {
+                Debug.LogWarning(
+                    "DiningRoomChaseCutscene cannot use spawn-aware loading because SceneTransitionManager is unavailable.",
+                    this);
+                return;
+            }
+
+            SceneTransitionManager.Instance.LoadScene(nextSceneName, nextSpawnId);
+            return;
+        }
+
+        LoadSelfContainedScene(nextSceneName);
+    }
+
+    private void LoadSelfContainedScene(string sceneName)
+    {
+        if (HotelHungerRuntimeManager.Instance != null)
+        {
+            HotelHungerRuntimeManager.Instance.LoadSceneWithFade(sceneName);
+            return;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(sceneName))
+        {
+            Debug.LogWarning($"DiningRoomChaseCutscene cannot load scene '{sceneName}' because it is not in Build Settings.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(sceneName);
     }
 
     private bool HasRequiredReferences()

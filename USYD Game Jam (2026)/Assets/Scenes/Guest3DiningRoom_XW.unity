@@ -7798,8 +7798,8 @@ MonoBehaviour:
   guestRunDuration: 4.65
   staffRunDuration: 4.45
   transitionDelay: 0.35
-  loadNextSceneOnComplete: 0
-  nextSceneName: 
+  loadNextSceneOnComplete: 1
+  nextSceneName: Pov1_Guest3_Guide_Task1_WetFloorSign
   nextSpawnId: 
 --- !u!4 &1572320463
 Transform:
