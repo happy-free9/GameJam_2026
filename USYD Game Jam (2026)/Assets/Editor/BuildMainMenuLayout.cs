@@ -12,24 +12,46 @@ public static class BuildMainMenuLayout
     private const string MenuPath = "Tools/Hotel Hunger/Build Main Menu";
     private const string ScenePath = "Assets/Scenes/MainMenu_XW.unity";
     private const string MainMenuSceneName = "MainMenu_XW";
+    private const string TitleScreenSpritePath = "Assets/Pixel Art/New_Title_Screen(The_Hotel).png";
+    private const string CreditsBody =
+        "USYD Game Jam 2026\n\n" +
+        "Team Credits:\n" +
+        "Linh Tran\n" +
+        "Sam Kero\n" +
+        "Zia Zheng\n" +
+        "Xiangwen Guo";
 
-    private static readonly Color BackgroundColor = new(0.03f, 0.025f, 0.03f, 1f);
-    private static readonly Color PanelColor = new(0.08f, 0.075f, 0.09f, 0.92f);
-    private static readonly Color ButtonColor = new(0.18f, 0.16f, 0.2f, 1f);
-    private static readonly Color ButtonHighlightColor = new(0.28f, 0.24f, 0.32f, 1f);
-    private static readonly Color TextColor = new(0.95f, 0.9f, 0.8f, 1f);
-    private static readonly Color MutedTextColor = new(0.72f, 0.68f, 0.62f, 1f);
+    private static readonly Color BackgroundColor = new(0.5f, 0.78f, 0.76f, 1f);
+    private static readonly Color PanelColor = new(0.08f, 0.045f, 0.025f, 0.82f);
+    private static readonly Color MainMenuPanelColor = new(0.48f, 0.22f, 0.07f, 0f);
+    private static readonly Color TransparentButtonColor = new(0.52f, 0.24f, 0.08f, 0f);
+    private static readonly Color ButtonColor = new(0.52f, 0.24f, 0.08f, 0.22f);
+    private static readonly Color ButtonHighlightColor = new(0.78f, 0.4f, 0.12f, 0.34f);
+    private static readonly Color TextColor = new(1f, 0.9f, 0.58f, 1f);
+    private static readonly Color MutedTextColor = new(0.82f, 0.7f, 0.48f, 1f);
+    private static readonly Color ButtonOutlineColor = new(0.38f, 0.16f, 0.04f, 0.92f);
 
     [MenuItem(MenuPath)]
-    private static void Build()
+    public static void Build()
     {
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+        BuildInternal(promptToSaveOpenScenes: true, restoreOriginalScene: true, showDialog: true);
+    }
+
+    public static void BuildFromBatchmode()
+    {
+        BuildInternal(promptToSaveOpenScenes: false, restoreOriginalScene: false, showDialog: false);
+    }
+
+    private static void BuildInternal(bool promptToSaveOpenScenes, bool restoreOriginalScene, bool showDialog)
+    {
+        if (promptToSaveOpenScenes && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
         {
             Debug.LogWarning("Build Main Menu cancelled before opening or creating MainMenu_XW.");
             return;
         }
 
         string originalScenePath = SceneManager.GetActiveScene().path;
+        ConfigureTitleScreenImporter();
 
         Scene menuScene = OpenOrCreateMainMenuScene();
         BuildSceneContents(menuScene);
@@ -38,17 +60,21 @@ public static class BuildMainMenuLayout
         AssetDatabase.Refresh();
         InsertMainMenuFirstInBuildSettings();
 
-        if (!string.IsNullOrWhiteSpace(originalScenePath) &&
+        if (restoreOriginalScene &&
+            !string.IsNullOrWhiteSpace(originalScenePath) &&
             originalScenePath != ScenePath &&
             AssetDatabase.LoadAssetAtPath<SceneAsset>(originalScenePath) != null)
         {
             EditorSceneManager.OpenScene(originalScenePath, OpenSceneMode.Single);
         }
 
-        EditorUtility.DisplayDialog(
-            "Build Main Menu",
-            "MainMenu_XW was created or updated, saved, and inserted first in Build Settings.",
-            "OK");
+        if (showDialog)
+        {
+            EditorUtility.DisplayDialog(
+                "Build Main Menu",
+                "MainMenu_XW was created or updated, saved, and inserted first in Build Settings.",
+                "OK");
+        }
     }
 
     private static Scene OpenOrCreateMainMenuScene()
@@ -60,6 +86,24 @@ public static class BuildMainMenuLayout
         }
 
         return EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+    }
+
+    private static void ConfigureTitleScreenImporter()
+    {
+        TextureImporter importer = AssetImporter.GetAtPath(TitleScreenSpritePath) as TextureImporter;
+        if (importer == null)
+        {
+            Debug.LogWarning($"Build Main Menu could not find title-screen art at {TitleScreenSpritePath}.");
+            return;
+        }
+
+        importer.textureType = TextureImporterType.Sprite;
+        importer.spriteImportMode = SpriteImportMode.Single;
+        importer.filterMode = FilterMode.Point;
+        importer.mipmapEnabled = false;
+        importer.textureCompression = TextureImporterCompression.Uncompressed;
+        importer.alphaIsTransparency = true;
+        importer.SaveAndReimport();
     }
 
     private static void BuildSceneContents(Scene scene)
@@ -86,20 +130,26 @@ public static class BuildMainMenuLayout
         RectTransform canvasRect = canvasObject.GetComponent<RectTransform>();
         Stretch(canvasRect);
 
-        GameObject background = CreatePanel(canvasRect, "Background", BackgroundColor);
+        GameObject background = CreatePanel(canvasRect, "SamTitleScreenBackground", Color.white);
         Stretch(background.GetComponent<RectTransform>());
+        Image backgroundImage = background.GetComponent<Image>();
+        backgroundImage.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(TitleScreenSpritePath);
+        backgroundImage.type = Image.Type.Simple;
+        backgroundImage.preserveAspect = false;
+        backgroundImage.raycastTarget = false;
 
-        Text titleText = CreateText(canvasRect, "TitleText", "Hotel Hunger", 72, TextAnchor.MiddleCenter, TextColor);
-        SetAnchored(titleText.rectTransform, new Vector2(0.5f, 0.82f), new Vector2(760f, 120f), Vector2.zero);
+        Text titleText = null;
 
-        GameObject mainPanel = CreatePanel(canvasRect, "MainPanel", PanelColor);
-        SetAnchored(mainPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.43f), new Vector2(520f, 560f), Vector2.zero);
+        GameObject mainPanel = CreateMainMenuPanel(canvasRect);
 
-        ButtonParts startGame = CreateButton(mainPanel.transform, "StartGameButton", "Start Game", new Vector2(0f, 180f));
-        ButtonParts continueGame = CreateButton(mainPanel.transform, "ContinueButton", "Continue", new Vector2(0f, 90f));
-        ButtonParts settings = CreateButton(mainPanel.transform, "SettingsButton", "Settings", new Vector2(0f, 0f));
-        ButtonParts credits = CreateButton(mainPanel.transform, "CreditsButton", "Credits", new Vector2(0f, -90f));
-        ButtonParts quit = CreateButton(mainPanel.transform, "QuitButton", "Quit Game", new Vector2(0f, -180f));
+        ButtonParts startGame = CreateMainMenuButton(mainPanel.transform, "StartGameButton", "Start Game");
+        ButtonParts settings = CreateMainMenuButton(mainPanel.transform, "SettingsButton", "Settings");
+        ButtonParts credits = CreateMainMenuButton(mainPanel.transform, "CreditsButton", "Credits");
+        ButtonParts quit = CreateMainMenuButton(mainPanel.transform, "QuitButton", "Quit Game");
+        StyleMainMenuButton(startGame);
+        StyleMainMenuButton(settings);
+        StyleMainMenuButton(credits);
+        StyleMainMenuButton(quit);
 
         GameObject settingsPanel = CreatePanel(canvasRect, "SettingsPanel", PanelColor);
         SetAnchored(settingsPanel.GetComponent<RectTransform>(), new Vector2(0.5f, 0.5f), new Vector2(980f, 820f), Vector2.zero);
@@ -107,13 +157,12 @@ public static class BuildMainMenuLayout
         Text settingsTitle = CreateText(settingsPanel.transform, "SettingsTitle", "Settings", 44, TextAnchor.MiddleCenter, TextColor);
         SetAnchored(settingsTitle.rectTransform, new Vector2(0.5f, 0.92f), new Vector2(600f, 70f), Vector2.zero);
 
-        Text masterVolumeLabel = CreateText(settingsPanel.transform, "MasterVolumeLabel", "Master Volume", 26, TextAnchor.MiddleLeft, TextColor);
-        SetAnchored(masterVolumeLabel.rectTransform, new Vector2(0.3f, 0.79f), new Vector2(320f, 46f), Vector2.zero);
-        Slider volumeSlider = CreateSlider(settingsPanel.transform, "MasterVolumeSlider", new Vector2(180f, 238f));
+        GameObject settingsRows = CreateSettingsRowsContainer(settingsPanel.transform);
+        Text masterVolumeLabel = CreateSettingsRowLabel(settingsRows.transform, "MasterVolumeLabel", "Master Volume");
+        Slider volumeSlider = CreateSlider(masterVolumeLabel.transform.parent, "MasterVolumeSlider");
 
-        Text languageLabel = CreateText(settingsPanel.transform, "LanguageLabel", "Language", 26, TextAnchor.MiddleLeft, TextColor);
-        SetAnchored(languageLabel.rectTransform, new Vector2(0.3f, 0.69f), new Vector2(320f, 46f), Vector2.zero);
-        Dropdown languageDropdown = CreateDropdown(settingsPanel.transform, "LanguageDropdown", new Vector2(180f, 156f));
+        Text languageLabel = CreateSettingsRowLabel(settingsRows.transform, "LanguageLabel", "Language");
+        Dropdown languageDropdown = CreateDropdown(languageLabel.transform.parent, "LanguageDropdown");
 
         Text controlsTitle = CreateText(settingsPanel.transform, "ControlsTitle", "Controls", 30, TextAnchor.MiddleCenter, TextColor);
         SetAnchored(controlsTitle.rectTransform, new Vector2(0.5f, 0.58f), new Vector2(420f, 54f), Vector2.zero);
@@ -139,8 +188,8 @@ public static class BuildMainMenuLayout
         Text creditsTitle = CreateText(creditsPanel.transform, "CreditsTitle", "Credits", 44, TextAnchor.MiddleCenter, TextColor);
         SetAnchored(creditsTitle.rectTransform, new Vector2(0.5f, 0.82f), new Vector2(500f, 70f), Vector2.zero);
 
-        Text creditsBody = CreateText(creditsPanel.transform, "CreditsBody", "Hotel Hunger\nUSYD Game Jam 2026\nTeam Credits: To be added", 30, TextAnchor.MiddleCenter, TextColor);
-        SetAnchored(creditsBody.rectTransform, new Vector2(0.5f, 0.52f), new Vector2(620f, 230f), Vector2.zero);
+        Text creditsBody = CreateText(creditsPanel.transform, "CreditsBody", CreditsBody, 30, TextAnchor.MiddleCenter, TextColor);
+        SetAnchored(creditsBody.rectTransform, new Vector2(0.5f, 0.52f), new Vector2(620f, 310f), Vector2.zero);
 
         ButtonParts creditsBack = CreateButton(creditsPanel.transform, "CreditsBackButton", "Back", new Vector2(0f, -210f), new Vector2(220f, 58f));
 
@@ -164,8 +213,6 @@ public static class BuildMainMenuLayout
             titleText,
             startGame.Button,
             startGame.Label,
-            continueGame.Button,
-            continueGame.Label,
             settings.Button,
             settings.Label,
             credits.Button,
@@ -243,6 +290,25 @@ public static class BuildMainMenuLayout
         return panel;
     }
 
+    private static GameObject CreateMainMenuPanel(Transform parent)
+    {
+        GameObject panel = CreatePanel(parent, "MainPanel", MainMenuPanelColor);
+        SetAnchored(panel.GetComponent<RectTransform>(), new Vector2(0.255f, 0.405f), new Vector2(560f, 310f), Vector2.zero);
+
+        Image image = panel.GetComponent<Image>();
+        image.raycastTarget = false;
+
+        VerticalLayoutGroup layout = panel.AddComponent<VerticalLayoutGroup>();
+        layout.childAlignment = TextAnchor.MiddleLeft;
+        layout.childControlWidth = false;
+        layout.childControlHeight = false;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = false;
+        layout.spacing = 14f;
+
+        return panel;
+    }
+
     private static Text CreateText(Transform parent, string name, string value, int fontSize, TextAnchor alignment, Color color)
     {
         GameObject textObject = new(name, typeof(RectTransform), typeof(Text));
@@ -278,21 +344,133 @@ public static class BuildMainMenuLayout
         colors.normalColor = ButtonColor;
         colors.highlightedColor = ButtonHighlightColor;
         colors.selectedColor = ButtonHighlightColor;
-        colors.pressedColor = new Color(0.12f, 0.1f, 0.14f, 1f);
-        colors.disabledColor = new Color(0.12f, 0.11f, 0.13f, 0.65f);
+        colors.pressedColor = new Color(0.35f, 0.15f, 0.05f, 0.42f);
+        colors.disabledColor = new Color(0.15f, 0.1f, 0.07f, 0.24f);
         button.colors = colors;
 
         Text text = CreateText(buttonObject.transform, "Text", label, 26, TextAnchor.MiddleCenter, TextColor);
         Stretch(text.rectTransform, new Vector2(18f, 8f), new Vector2(-18f, -8f));
+        AddWarmTextEffects(text, new Vector2(1.5f, -1.5f));
 
         return new ButtonParts(button, text);
     }
 
-    private static Slider CreateSlider(Transform parent, string name, Vector2 anchoredPosition)
+    private static ButtonParts CreateMainMenuButton(Transform parent, string name, string label)
     {
-        GameObject sliderObject = new(name, typeof(RectTransform), typeof(Slider));
+        GameObject buttonObject = new(name, typeof(RectTransform), typeof(Image), typeof(Button), typeof(LayoutElement));
+        buttonObject.transform.SetParent(parent, false);
+
+        RectTransform rect = buttonObject.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(520f, 66f);
+
+        LayoutElement layout = buttonObject.GetComponent<LayoutElement>();
+        layout.minWidth = 520f;
+        layout.preferredWidth = 520f;
+        layout.minHeight = 66f;
+        layout.preferredHeight = 66f;
+
+        Image image = buttonObject.GetComponent<Image>();
+        image.color = TransparentButtonColor;
+        image.raycastTarget = true;
+
+        Button button = buttonObject.GetComponent<Button>();
+        button.targetGraphic = image;
+
+        Text text = CreateText(buttonObject.transform, "Text", label, 42, TextAnchor.MiddleLeft, TextColor);
+        Stretch(text.rectTransform, new Vector2(28f, 4f), new Vector2(-20f, -4f));
+
+        return new ButtonParts(button, text);
+    }
+
+    private static void StyleMainMenuButton(ButtonParts buttonParts)
+    {
+        Image image = buttonParts.Button.GetComponent<Image>();
+        image.color = TransparentButtonColor;
+
+        ColorBlock colors = buttonParts.Button.colors;
+        colors.normalColor = TransparentButtonColor;
+        colors.highlightedColor = new Color(0.8f, 0.42f, 0.14f, 0.08f);
+        colors.selectedColor = colors.highlightedColor;
+        colors.pressedColor = new Color(0.36f, 0.16f, 0.05f, 0.14f);
+        colors.disabledColor = new Color(0.12f, 0.08f, 0.05f, 0f);
+        buttonParts.Button.colors = colors;
+
+        buttonParts.Label.fontSize = 42;
+        buttonParts.Label.fontStyle = FontStyle.Bold;
+        buttonParts.Label.alignment = TextAnchor.MiddleLeft;
+        buttonParts.Label.color = TextColor;
+        Stretch(buttonParts.Label.rectTransform, new Vector2(28f, 4f), new Vector2(-20f, -4f));
+        AddWarmTextEffects(buttonParts.Label, new Vector2(2f, -2f));
+    }
+
+    private static void AddWarmTextEffects(Text text, Vector2 distance)
+    {
+        Outline outline = text.gameObject.GetComponent<Outline>();
+        if (outline == null)
+        {
+            outline = text.gameObject.AddComponent<Outline>();
+        }
+
+        outline.effectColor = ButtonOutlineColor;
+        outline.effectDistance = distance;
+
+        Shadow shadow = text.gameObject.GetComponent<Shadow>();
+        if (shadow == null)
+        {
+            shadow = text.gameObject.AddComponent<Shadow>();
+        }
+
+        shadow.effectColor = new Color(0.16f, 0.06f, 0.02f, 0.72f);
+        shadow.effectDistance = distance * 1.8f;
+    }
+
+    private static GameObject CreateSettingsRowsContainer(Transform parent)
+    {
+        GameObject container = new("SettingsRows", typeof(RectTransform), typeof(VerticalLayoutGroup));
+        container.transform.SetParent(parent, false);
+        SetAnchored(container.GetComponent<RectTransform>(), new Vector2(0.5f, 0.74f), new Vector2(720f, 136f), Vector2.zero);
+
+        VerticalLayoutGroup layout = container.GetComponent<VerticalLayoutGroup>();
+        layout.childAlignment = TextAnchor.MiddleCenter;
+        layout.childControlWidth = true;
+        layout.childControlHeight = true;
+        layout.childForceExpandWidth = false;
+        layout.childForceExpandHeight = false;
+        layout.spacing = 18f;
+
+        return container;
+    }
+
+    private static Text CreateSettingsRowLabel(Transform parent, string name, string value)
+    {
+        GameObject row = new(name.Replace("Label", "Row"), typeof(RectTransform), typeof(HorizontalLayoutGroup), typeof(LayoutElement));
+        row.transform.SetParent(parent, false);
+
+        LayoutElement rowLayoutElement = row.GetComponent<LayoutElement>();
+        rowLayoutElement.minWidth = 720f;
+        rowLayoutElement.preferredWidth = 720f;
+        rowLayoutElement.minHeight = 58f;
+        rowLayoutElement.preferredHeight = 58f;
+
+        HorizontalLayoutGroup rowLayout = row.GetComponent<HorizontalLayoutGroup>();
+        rowLayout.childAlignment = TextAnchor.MiddleCenter;
+        rowLayout.childControlWidth = true;
+        rowLayout.childControlHeight = true;
+        rowLayout.childForceExpandWidth = false;
+        rowLayout.childForceExpandHeight = false;
+        rowLayout.spacing = 34f;
+
+        Text label = CreateText(row.transform, name, value, 26, TextAnchor.MiddleLeft, TextColor);
+        AddLayoutElement(label.gameObject, 240f, 58f);
+        return label;
+    }
+
+    private static Slider CreateSlider(Transform parent, string name)
+    {
+        GameObject sliderObject = new(name, typeof(RectTransform), typeof(Slider), typeof(LayoutElement));
         sliderObject.transform.SetParent(parent, false);
-        SetAnchored(sliderObject.GetComponent<RectTransform>(), new Vector2(0.62f, 0.79f), new Vector2(420f, 38f), anchoredPosition);
+        sliderObject.GetComponent<RectTransform>().sizeDelta = new Vector2(380f, 44f);
+        AddLayoutElement(sliderObject, 380f, 44f);
 
         GameObject background = CreatePanel(sliderObject.transform, "Background", new Color(0.02f, 0.02f, 0.025f, 1f));
         Stretch(background.GetComponent<RectTransform>(), new Vector2(0f, 12f), new Vector2(0f, -12f));
@@ -321,11 +499,12 @@ public static class BuildMainMenuLayout
         return slider;
     }
 
-    private static Dropdown CreateDropdown(Transform parent, string name, Vector2 anchoredPosition)
+    private static Dropdown CreateDropdown(Transform parent, string name)
     {
-        GameObject dropdownObject = new(name, typeof(RectTransform), typeof(Image), typeof(Dropdown));
+        GameObject dropdownObject = new(name, typeof(RectTransform), typeof(Image), typeof(Dropdown), typeof(LayoutElement));
         dropdownObject.transform.SetParent(parent, false);
-        SetAnchored(dropdownObject.GetComponent<RectTransform>(), new Vector2(0.62f, 0.69f), new Vector2(420f, 58f), anchoredPosition);
+        dropdownObject.GetComponent<RectTransform>().sizeDelta = new Vector2(380f, 58f);
+        AddLayoutElement(dropdownObject, 380f, 58f);
 
         Image image = dropdownObject.GetComponent<Image>();
         image.color = ButtonColor;
@@ -350,6 +529,20 @@ public static class BuildMainMenuLayout
         };
         template.SetActive(false);
         return dropdown;
+    }
+
+    private static void AddLayoutElement(GameObject target, float preferredWidth, float preferredHeight)
+    {
+        LayoutElement layout = target.GetComponent<LayoutElement>();
+        if (layout == null)
+        {
+            layout = target.AddComponent<LayoutElement>();
+        }
+
+        layout.minWidth = preferredWidth;
+        layout.preferredWidth = preferredWidth;
+        layout.minHeight = preferredHeight;
+        layout.preferredHeight = preferredHeight;
     }
 
     private static GameObject CreateDropdownTemplate(Transform parent)
@@ -465,13 +658,7 @@ public static class BuildMainMenuLayout
 
     private static Font GetBuiltInFont()
     {
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        if (font != null)
-        {
-            return font;
-        }
-
-        return Resources.GetBuiltinResource<Font>("Arial.ttf");
+        return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
     }
 
     private readonly struct ButtonParts

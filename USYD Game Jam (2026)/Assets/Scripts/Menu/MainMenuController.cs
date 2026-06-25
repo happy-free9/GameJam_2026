@@ -4,6 +4,22 @@ using UnityEngine.UI;
 
 public class MainMenuController : MonoBehaviour
 {
+    private const string EnglishCreditsBody =
+        "USYD Game Jam 2026\n\n" +
+        "Team Credits:\n" +
+        "Linh Tran\n" +
+        "Sam Kero\n" +
+        "Zia Zheng\n" +
+        "Xiangwen Guo";
+
+    private const string ChineseCreditsBody =
+        "USYD Game Jam 2026\n\n" +
+        "鍒朵綔浜哄憳锛?\n" +
+        "Linh Tran\n" +
+        "Sam Kero\n" +
+        "Zia Zheng\n" +
+        "Xiangwen Guo";
+
     [Header("Panels")]
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject settingsPanel;
@@ -14,8 +30,6 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Text titleText;
     [SerializeField] private Button startGameButton;
     [SerializeField] private Text startGameButtonText;
-    [SerializeField] private Button continueButton;
-    [SerializeField] private Text continueButtonText;
     [SerializeField] private Button settingsButton;
     [SerializeField] private Text settingsButtonText;
     [SerializeField] private Button creditsButton;
@@ -82,7 +96,6 @@ public class MainMenuController : MonoBehaviour
 
         if (runtimeManager != null)
         {
-            runtimeManager.CheckpointChanged += RefreshContinueAvailability;
             runtimeManager.SettingsChanged += RefreshAll;
         }
 
@@ -94,7 +107,6 @@ public class MainMenuController : MonoBehaviour
     {
         if (runtimeManager != null)
         {
-            runtimeManager.CheckpointChanged -= RefreshContinueAvailability;
             runtimeManager.SettingsChanged -= RefreshAll;
         }
 
@@ -117,8 +129,6 @@ public class MainMenuController : MonoBehaviour
         Text newTitleText,
         Button newStartGameButton,
         Text newStartGameButtonText,
-        Button newContinueButton,
-        Text newContinueButtonText,
         Button newSettingsButton,
         Text newSettingsButtonText,
         Button newCreditsButton,
@@ -168,8 +178,6 @@ public class MainMenuController : MonoBehaviour
         titleText = newTitleText;
         startGameButton = newStartGameButton;
         startGameButtonText = newStartGameButtonText;
-        continueButton = newContinueButton;
-        continueButtonText = newContinueButtonText;
         settingsButton = newSettingsButton;
         settingsButtonText = newSettingsButtonText;
         creditsButton = newCreditsButton;
@@ -221,7 +229,6 @@ public class MainMenuController : MonoBehaviour
         }
 
         AddClick(startGameButton, HandleStartGame);
-        AddClick(continueButton, HandleContinueGame);
         AddClick(settingsButton, ShowSettingsPanel);
         AddClick(creditsButton, ShowCreditsPanel);
         AddClick(quitButton, HandleQuitGame);
@@ -257,7 +264,6 @@ public class MainMenuController : MonoBehaviour
         }
 
         RemoveClick(startGameButton, HandleStartGame);
-        RemoveClick(continueButton, HandleContinueGame);
         RemoveClick(settingsButton, ShowSettingsPanel);
         RemoveClick(creditsButton, ShowCreditsPanel);
         RemoveClick(quitButton, HandleQuitGame);
@@ -294,7 +300,6 @@ public class MainMenuController : MonoBehaviour
         SetActive(resetProgressConfirmationPanel, false);
         isCapturingBinding = false;
         SetText(captureStatusText, string.Empty);
-        RefreshContinueAvailability();
     }
 
     private void ShowSettingsPanel()
@@ -335,17 +340,6 @@ public class MainMenuController : MonoBehaviour
         }
 
         runtimeManager.StartNewGame();
-    }
-
-    private void HandleContinueGame()
-    {
-        if (runtimeManager == null || runtimeManager.IsLoading || !runtimeManager.HasValidCheckpoint())
-        {
-            RefreshContinueAvailability();
-            return;
-        }
-
-        runtimeManager.ContinueGame();
     }
 
     private void HandleQuitGame()
@@ -411,7 +405,6 @@ public class MainMenuController : MonoBehaviour
     {
         runtimeManager?.ClearCheckpoint();
         HideResetProgressConfirmation();
-        RefreshContinueAvailability();
     }
 
     private void BeginBindingCapture(HotelHungerRuntimeManager.MovementDirection direction)
@@ -478,23 +471,12 @@ public class MainMenuController : MonoBehaviour
         RefreshLocalizedLabels();
         RefreshSettingsControls();
         RefreshControlBindings();
-        RefreshContinueAvailability();
-    }
-
-    private void RefreshContinueAvailability()
-    {
-        bool canContinue = runtimeManager != null && runtimeManager.HasValidCheckpoint();
-        if (continueButton != null)
-        {
-            continueButton.interactable = canContinue;
-        }
     }
 
     private void RefreshLocalizedLabels()
     {
-        SetText(titleText, "Hotel Hunger");
+        SetText(titleText, string.Empty);
         SetText(startGameButtonText, Localize("Start Game"));
-        SetText(continueButtonText, Localize("Continue"));
         SetText(settingsButtonText, Localize("Settings"));
         SetText(creditsButtonText, Localize("Credits"));
         SetText(quitButtonText, Localize("Quit Game"));
@@ -511,11 +493,18 @@ public class MainMenuController : MonoBehaviour
         SetText(resetProgressButtonText, Localize("Reset Progress"));
         SetText(settingsBackButtonText, Localize("Back"));
         SetText(creditsTitleText, Localize("Credits"));
-        SetText(creditsBodyText, "Hotel Hunger\nUSYD Game Jam 2026\nTeam Credits: To be added");
+        SetText(creditsBodyText, GetCreditsBody());
         SetText(creditsBackButtonText, Localize("Back"));
         SetText(resetProgressConfirmationText, Localize("Reset progress confirmation"));
         SetText(confirmResetProgressButtonText, Localize("Confirm"));
         SetText(cancelResetProgressButtonText, Localize("Cancel"));
+    }
+
+    private string GetCreditsBody()
+    {
+        bool chinese = runtimeManager != null &&
+            runtimeManager.GetLanguage() == HotelHungerRuntimeManager.ChineseLanguageCode;
+        return chinese ? ChineseCreditsBody : EnglishCreditsBody;
     }
 
     private void RefreshSettingsControls()
@@ -559,7 +548,6 @@ public class MainMenuController : MonoBehaviour
         return english switch
         {
             "Start Game" => "开始游戏",
-            "Continue" => "继续游戏",
             "Settings" => "设置",
             "Credits" => "制作名单",
             "Quit Game" => "退出游戏",

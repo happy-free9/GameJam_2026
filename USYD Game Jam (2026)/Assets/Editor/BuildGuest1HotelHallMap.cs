@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEditor.Events;
 using UnityEditor.SceneManagement;
@@ -28,7 +29,13 @@ public static class BuildGuest1HotelHallMap
     private const string ZiaFinalChaseScenePath = "Assets/Scenes/Guest3_Final_Chasing.unity";
     private const string ZiaTask1SceneName = "Pov1_Guest3_Guide_Task1_WetFloorSign";
     private const string SkippedZiaBgmPrefabGuid = "72f5896f6fc84982a711fa29b7885d8a";
-    private const string ZiaTask1BackgroundPath = "Assets/Pixel Art/Final_no_sign.png";
+    private const string ZiaGuest3SpritePath = "Assets/Characters/Guest_3_char.png";
+    private const string ZiaFloorSpritePath = "Assets/Sprites/Floor.png";
+    private const string ZiaTask1BackgroundPath = "Assets/Pixel Art/3rd_Hotel_hall/Final_no_sign.png";
+    private const string ZiaTask1WetFloorSignSpritePath = "Assets/Pixel Art/3rd_Hotel_hall/Slipper_sign.png";
+    private const string ZiaTask2PottedPlantSpritePath = "Assets/Pixel Art/1st_Hotel_hall/Plants.png";
+    private const string ZiaTask3BackgroundPath = "Assets/Pixel Art/No_Cart_4_hotel_hall.png";
+    private const string ZiaFinalChaseBackgroundPath = "Assets/Pixel Art/Elevator Room/Final.png";
     private const string HorrorChaseScenePath = "Assets/Scenes/Guest3HorrorChase_XW.unity";
     private const string GoodEndingScenePath = "Assets/Scenes/GoodEnding_XW.unity";
     private const string BadEndingScenePath = "Assets/Scenes/BadEnding_XW.unity";
@@ -50,14 +57,19 @@ public static class BuildGuest1HotelHallMap
     private const string UpdatedRedCartSpritePath = "Assets/Pixel Art/Updated 4th_Hotel_Hall/Red_Trolley_Cart.png";
     private const string UpdatedFourthHallFloorPath = "Assets/Pixel Art/Updated 4th_Hotel_Hall/Floor.png";
     private const string UpdatedFourthHallOutOfBoundsPath = "Assets/Pixel Art/Updated 4th_Hotel_Hall/Out_of_bounds.png";
-    private const string ZiaPottedPlantSpritePath = "Assets/Sprites/Potted Plant.PNG";
 
     private static readonly string[] RequiredSpritePaths =
     {
         ConciergeSpritePath,
         Guest1SpritePath,
         Guest3SpritePath,
+        ZiaGuest3SpritePath,
+        ZiaFloorSpritePath,
         ZiaTask1BackgroundPath,
+        ZiaTask1WetFloorSignSpritePath,
+        ZiaTask2PottedPlantSpritePath,
+        ZiaTask3BackgroundPath,
+        ZiaFinalChaseBackgroundPath,
         HotelHall1BackgroundPath,
         HotelHall2BackgroundPath,
         WaitingHallBackgroundPath,
@@ -70,8 +82,70 @@ public static class BuildGuest1HotelHallMap
         UpdatedBlueCartSpritePath,
         UpdatedRedCartSpritePath,
         UpdatedFourthHallFloorPath,
-        UpdatedFourthHallOutOfBoundsPath,
-        ZiaPottedPlantSpritePath
+        UpdatedFourthHallOutOfBoundsPath
+    };
+
+    private static readonly string[] ImportedZiaScenePaths =
+    {
+        ZiaTask1ScenePath,
+        ZiaTask2ScenePath,
+        ZiaTask3ScenePath,
+        ZiaFinalChaseScenePath
+    };
+
+    private static readonly Dictionary<string, string[]> RequiredZiaSpritePathsByScene = new Dictionary<string, string[]>
+    {
+        {
+            ZiaTask1ScenePath,
+            new[]
+            {
+                ZiaGuest3SpritePath,
+                ZiaFloorSpritePath,
+                ZiaTask1BackgroundPath,
+                ZiaTask1WetFloorSignSpritePath
+            }
+        },
+        {
+            ZiaTask2ScenePath,
+            new[]
+            {
+                ZiaGuest3SpritePath,
+                ZiaFloorSpritePath,
+                HotelHall2BackgroundPath,
+                ZiaTask2PottedPlantSpritePath
+            }
+        },
+        {
+            ZiaTask3ScenePath,
+            new[]
+            {
+                ZiaGuest3SpritePath,
+                ZiaFloorSpritePath,
+                ZiaTask3BackgroundPath,
+                UpdatedRedCartSpritePath,
+                UpdatedBlueCartSpritePath
+            }
+        },
+        {
+            ZiaFinalChaseScenePath,
+            new[]
+            {
+                ZiaGuest3SpritePath,
+                ZiaFloorSpritePath,
+                ZiaFinalChaseBackgroundPath
+            }
+        }
+    };
+
+    private static readonly HashSet<string> ExactImportedZiaSpritePaths = new HashSet<string>
+    {
+        ZiaGuest3SpritePath,
+        ZiaFloorSpritePath,
+        ZiaTask1BackgroundPath,
+        ZiaTask1WetFloorSignSpritePath,
+        ZiaTask2PottedPlantSpritePath,
+        ZiaTask3BackgroundPath,
+        ZiaFinalChaseBackgroundPath
     };
 
     private static readonly string[] PreferredBuildSceneOrder =
@@ -140,6 +214,7 @@ public static class BuildGuest1HotelHallMap
         AssetDatabase.Refresh();
 
         string originalScenePath = SceneManager.GetActiveScene().path;
+        string ziaValidationSummary = string.Empty;
 
         Undo.SetCurrentGroupName(UndoName);
         int undoGroup = Undo.GetCurrentGroup();
@@ -154,7 +229,7 @@ public static class BuildGuest1HotelHallMap
             BuildNormalDiningRoom();
             BuildBasementRoom();
             ConfigureGuest3DiningRoomChaseArt();
-            CleanupImportedZiaScenes();
+            ziaValidationSummary = CleanupImportedZiaScenes();
             UpdateBuildSettings();
         }
         finally
@@ -171,9 +246,15 @@ public static class BuildGuest1HotelHallMap
             EditorSceneManager.OpenScene(originalScenePath, OpenSceneMode.Single);
         }
 
+        string completionMessage = "Guest 1 hotel hall route scenes and wiring were built.";
+        if (!string.IsNullOrWhiteSpace(ziaValidationSummary))
+        {
+            completionMessage += "\n\n" + ziaValidationSummary;
+        }
+
         EditorUtility.DisplayDialog(
             "Build Guest 1 Hotel Hall Map",
-            "Guest 1 hotel hall route scenes and wiring were built.",
+            completionMessage,
             "OK");
     }
 
@@ -553,63 +634,367 @@ public static class BuildGuest1HotelHallMap
         SaveScene(scene, Guest3DiningRoomScenePath);
     }
 
-    private static void CleanupImportedZiaScenes()
+    private static string CleanupImportedZiaScenes()
     {
-        string[] ziaScenePaths =
-        {
-            ZiaTask1ScenePath,
-            ZiaTask2ScenePath,
-            ZiaTask3ScenePath,
-            ZiaFinalChaseScenePath
-        };
+        StringBuilder summary = new StringBuilder();
 
-        for (int i = 0; i < ziaScenePaths.Length; i++)
+        for (int i = 0; i < ImportedZiaScenePaths.Length; i++)
         {
-            string scenePath = ziaScenePaths[i];
+            string scenePath = ImportedZiaScenePaths[i];
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(scenePath) == null)
             {
+                summary.AppendLine($"Missing imported Zia scene: {scenePath}");
                 continue;
             }
 
             Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
-            bool changed = false;
-            changed |= RepairImportedZiaSceneVisuals(scene, scenePath);
-            changed |= RemoveOptionalZiaBgmObjects(scene);
+            List<string> issues = new List<string>();
+            List<string> warnings = new List<string>();
+            ZiaSceneValidationStats stats = new ZiaSceneValidationStats();
+            bool changed = EnsureImportedZiaCamera(scene, warnings);
 
-            if (changed)
+            ValidateImportedZiaScene(scene, scenePath, issues, warnings, stats);
+
+            string sceneName = Path.GetFileNameWithoutExtension(scenePath);
+            if (issues.Count == 0)
             {
-                SaveScene(scene, scenePath);
+                stats.OptionalBgmRemovedCount = RemoveOptionalZiaBgmObjects(scene);
+                changed |= stats.OptionalBgmRemovedCount > 0;
+                if (changed)
+                {
+                    SaveScene(scene, scenePath);
+                }
+
+                summary.AppendLine(FormatZiaValidationSummary(sceneName, stats, true, changed));
+            }
+            else
+            {
+                summary.AppendLine(FormatZiaValidationSummary(sceneName, stats, false, false));
+                for (int issueIndex = 0; issueIndex < issues.Count; issueIndex++)
+                {
+                    summary.AppendLine($"- {issues[issueIndex]}");
+                }
+            }
+
+            for (int warningIndex = 0; warningIndex < warnings.Count; warningIndex++)
+            {
+                summary.AppendLine($"- Warning: {warnings[warningIndex]}");
+            }
+        }
+
+        string result = summary.ToString().TrimEnd();
+        if (!string.IsNullOrWhiteSpace(result))
+        {
+            Debug.Log("Build Guest 1 Hotel Hall Map: Zia guide scene validation\n" + result);
+            return "Zia guide scene validation:\n" + result;
+        }
+
+        return string.Empty;
+    }
+
+    private sealed class ZiaSceneValidationStats
+    {
+        public bool CameraValid;
+        public int VisibleSpriteRendererCount;
+        public int CameraOverlappingSpriteRendererCount;
+        public int MissingScriptCount;
+        public int OptionalBgmRemovedCount;
+    }
+
+    private static string FormatZiaValidationSummary(
+        string sceneName,
+        ZiaSceneValidationStats stats,
+        bool passed,
+        bool saved)
+    {
+        string result = passed ? "validation passed" : "validation failed, not saved";
+        if (saved)
+        {
+            result += ", saved cleanup";
+        }
+
+        return $"{sceneName}: {result}; camera valid: {stats.CameraValid}; " +
+            $"visible SpriteRenderers: {stats.VisibleSpriteRendererCount}; " +
+            $"camera-overlapping SpriteRenderers: {stats.CameraOverlappingSpriteRendererCount}; " +
+            $"missing required scripts: {stats.MissingScriptCount}; " +
+            $"optional BGM objects removed: {stats.OptionalBgmRemovedCount}";
+    }
+
+    private static bool EnsureImportedZiaCamera(Scene scene, List<string> warnings)
+    {
+        Camera camera = FindPreferredCamera(scene);
+        if (camera == null)
+        {
+            return false;
+        }
+
+        bool changed = false;
+        if (!camera.gameObject.activeSelf)
+        {
+            SetGameObjectAndParentsActive(camera.gameObject);
+            warnings.Add($"{scene.path}: enabled inactive camera '{GetGameObjectPath(camera.gameObject)}'.");
+            changed = true;
+        }
+
+        if (!camera.enabled)
+        {
+            Undo.RecordObject(camera, UndoName);
+            camera.enabled = true;
+            EditorUtility.SetDirty(camera);
+            warnings.Add($"{scene.path}: enabled disabled camera '{GetGameObjectPath(camera.gameObject)}'.");
+            changed = true;
+        }
+
+        if (camera.cullingMask == 0)
+        {
+            Undo.RecordObject(camera, UndoName);
+            camera.cullingMask = -1;
+            EditorUtility.SetDirty(camera);
+            warnings.Add($"{scene.path}: reset zero camera culling mask on '{GetGameObjectPath(camera.gameObject)}'.");
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private static void ValidateImportedZiaScene(
+        Scene scene,
+        string scenePath,
+        List<string> issues,
+        List<string> warnings,
+        ZiaSceneValidationStats stats)
+    {
+        Camera camera = FindEnabledCamera(scene);
+        stats.CameraValid = camera != null && camera.cullingMask != 0;
+        if (camera == null)
+        {
+            issues.Add($"{scenePath}: no active enabled Camera found.");
+        }
+        else if (camera.cullingMask == 0)
+        {
+            issues.Add($"{scenePath}: camera '{GetGameObjectPath(camera.gameObject)}' has an empty culling mask.");
+        }
+
+        CountMissingScripts(scene, issues, stats);
+        ValidateVisibleSpriteRenderers(scene, scenePath, camera, issues, warnings, stats);
+        ValidateRequiredZiaSprites(scene, scenePath, camera, issues);
+    }
+
+    private static void ValidateVisibleSpriteRenderers(
+        Scene scene,
+        string scenePath,
+        Camera camera,
+        List<string> issues,
+        List<string> warnings,
+        ZiaSceneValidationStats stats)
+    {
+        int visibleSpriteRenderers = 0;
+        int cameraOverlappingSpriteRenderers = 0;
+
+        GameObject[] roots = scene.GetRootGameObjects();
+        for (int i = 0; i < roots.Length; i++)
+        {
+            SpriteRenderer[] renderers = roots[i].GetComponentsInChildren<SpriteRenderer>(true);
+            for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
+            {
+                SpriteRenderer renderer = renderers[rendererIndex];
+                if (renderer == null || !renderer.gameObject.activeInHierarchy || !renderer.enabled)
+                {
+                    continue;
+                }
+
+                if (renderer.sprite == null)
+                {
+                    string message = $"{scenePath}: active SpriteRenderer '{GetGameObjectPath(renderer.gameObject)}' has no sprite.";
+                    if (IsKnownOptionalZiaNullSprite(scenePath, renderer))
+                    {
+                        warnings.Add(message + " This is a stale duplicate from the latest Zia scene and was left unchanged.");
+                    }
+                    else
+                    {
+                        issues.Add(message);
+                    }
+
+                    continue;
+                }
+
+                visibleSpriteRenderers++;
+                if (camera != null && RendererOverlapsCamera(renderer, camera))
+                {
+                    cameraOverlappingSpriteRenderers++;
+                }
+            }
+        }
+
+        stats.VisibleSpriteRendererCount = visibleSpriteRenderers;
+        stats.CameraOverlappingSpriteRendererCount = cameraOverlappingSpriteRenderers;
+
+        if (visibleSpriteRenderers == 0)
+        {
+            issues.Add($"{scenePath}: no active visible SpriteRenderer with a non-null sprite was found.");
+        }
+
+        if (camera != null && cameraOverlappingSpriteRenderers == 0)
+        {
+            issues.Add($"{scenePath}: no active SpriteRenderer overlaps camera '{GetGameObjectPath(camera.gameObject)}'.");
+        }
+    }
+
+    private static void ValidateRequiredZiaSprites(
+        Scene scene,
+        string scenePath,
+        Camera camera,
+        List<string> issues)
+    {
+        if (!RequiredZiaSpritePathsByScene.TryGetValue(scenePath, out string[] requiredSpritePaths))
+        {
+            return;
+        }
+
+        for (int i = 0; i < requiredSpritePaths.Length; i++)
+        {
+            string spritePath = requiredSpritePaths[i];
+            Sprite sprite = LoadSprite(spritePath);
+            if (sprite == null)
+            {
+                issues.Add($"{scenePath}: required Zia sprite asset is missing or not imported as a Sprite: {spritePath}");
+                continue;
+            }
+
+            if (!SceneHasVisibleSprite(scene, sprite, camera))
+            {
+                issues.Add($"{scenePath}: required Zia sprite is not visible in the scene/camera: {spritePath}");
             }
         }
     }
 
-    private static bool RepairImportedZiaSceneVisuals(Scene scene, string scenePath)
+    private static bool SceneHasVisibleSprite(Scene scene, Sprite sprite, Camera camera)
     {
-        bool changed = false;
+        GameObject[] roots = scene.GetRootGameObjects();
+        for (int i = 0; i < roots.Length; i++)
+        {
+            SpriteRenderer[] renderers = roots[i].GetComponentsInChildren<SpriteRenderer>(true);
+            for (int rendererIndex = 0; rendererIndex < renderers.Length; rendererIndex++)
+            {
+                SpriteRenderer renderer = renderers[rendererIndex];
+                if (renderer == null ||
+                    !renderer.gameObject.activeInHierarchy ||
+                    !renderer.enabled ||
+                    renderer.sprite != sprite)
+                {
+                    continue;
+                }
 
-        changed |= AssignSpriteIfObjectExists(scene, "Guest3", Guest3SpritePath, 10, Color.white);
-
-        if (scenePath == ZiaTask1ScenePath)
-        {
-            changed |= AssignSpriteIfObjectExists(scene, "Final_no_sign_0", ZiaTask1BackgroundPath, 0, Color.white);
-        }
-        else if (scenePath == ZiaTask2ScenePath)
-        {
-            changed |= AssignSpriteIfObjectExists(scene, "Final_0", HotelHall1BackgroundPath, 0, Color.white);
-            changed |= AssignSpriteIfObjectExists(scene, "PottedPlant_1", ZiaPottedPlantSpritePath, 8, Color.white);
-        }
-        else if (scenePath == ZiaTask3ScenePath)
-        {
-            changed |= AssignSpriteIfObjectExists(scene, "No_Cart_4_hotel_hall_0", CartHallBackgroundPath, 0, Color.white);
-            changed |= AssignSpriteIfObjectExists(scene, "LuggageCart_1", UpdatedRedCartSpritePath, 8, Color.white);
-            changed |= AssignSpriteIfObjectExists(scene, "Blue_Trolley_Cart_0 (1)", UpdatedBlueCartSpritePath, 1, Color.white);
-        }
-        else if (scenePath == ZiaFinalChaseScenePath)
-        {
-            changed |= AssignSpriteIfObjectExists(scene, "Final_0", HotelHall2BackgroundPath, 0, Color.white);
+                if (camera == null || RendererOverlapsCamera(renderer, camera))
+                {
+                    return true;
+                }
+            }
         }
 
-        return changed;
+        return false;
+    }
+
+    private static bool RendererOverlapsCamera(Renderer renderer, Camera camera)
+    {
+        if (renderer == null || camera == null)
+        {
+            return false;
+        }
+
+        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(camera);
+        return GeometryUtility.TestPlanesAABB(planes, renderer.bounds);
+    }
+
+    private static bool IsKnownOptionalZiaNullSprite(string scenePath, SpriteRenderer renderer)
+    {
+        return scenePath == ZiaTask2ScenePath && renderer != null && renderer.gameObject.name == "Final_0";
+    }
+
+    private static void CountMissingScripts(Scene scene, List<string> issues, ZiaSceneValidationStats stats)
+    {
+        GameObject[] roots = scene.GetRootGameObjects();
+        for (int i = 0; i < roots.Length; i++)
+        {
+            Transform[] transforms = roots[i].GetComponentsInChildren<Transform>(true);
+            for (int transformIndex = 0; transformIndex < transforms.Length; transformIndex++)
+            {
+                GameObject gameObject = transforms[transformIndex].gameObject;
+                int missingCount = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(gameObject);
+                if (missingCount > 0)
+                {
+                    if (IsOptionalZiaBgmObjectOrChild(gameObject))
+                    {
+                        continue;
+                    }
+
+                    stats.MissingScriptCount += missingCount;
+                    issues.Add($"{scene.path}: '{GetGameObjectPath(gameObject)}' has {missingCount} missing script component(s).");
+                }
+            }
+        }
+    }
+
+    private static Camera FindEnabledCamera(Scene scene)
+    {
+        Camera camera = FindPreferredCamera(scene);
+        if (camera != null && camera.gameObject.activeInHierarchy && camera.enabled)
+        {
+            return camera;
+        }
+
+        Camera[] cameras = FindSceneCameras(scene);
+        for (int i = 0; i < cameras.Length; i++)
+        {
+            if (cameras[i] != null && cameras[i].gameObject.activeInHierarchy && cameras[i].enabled)
+            {
+                return cameras[i];
+            }
+        }
+
+        return null;
+    }
+
+    private static Camera FindPreferredCamera(Scene scene)
+    {
+        GameObject mainCameraObject = FindByName(scene, "Main Camera");
+        if (mainCameraObject != null && mainCameraObject.TryGetComponent(out Camera mainCamera))
+        {
+            return mainCamera;
+        }
+
+        Camera[] cameras = FindSceneCameras(scene);
+        return cameras.Length > 0 ? cameras[0] : null;
+    }
+
+    private static Camera[] FindSceneCameras(Scene scene)
+    {
+        List<Camera> cameras = new List<Camera>();
+        GameObject[] roots = scene.GetRootGameObjects();
+        for (int i = 0; i < roots.Length; i++)
+        {
+            cameras.AddRange(roots[i].GetComponentsInChildren<Camera>(true));
+        }
+
+        return cameras.ToArray();
+    }
+
+    private static string GetGameObjectPath(GameObject gameObject)
+    {
+        if (gameObject == null)
+        {
+            return "<null>";
+        }
+
+        Stack<string> pathParts = new Stack<string>();
+        Transform current = gameObject.transform;
+        while (current != null)
+        {
+            pathParts.Push(current.name);
+            current = current.parent;
+        }
+
+        return string.Join("/", pathParts.ToArray());
     }
 
     private static bool AssignSpriteIfObjectExists(
@@ -640,7 +1025,7 @@ public static class BuildGuest1HotelHallMap
         return changed;
     }
 
-    private static bool RemoveOptionalZiaBgmObjects(Scene scene)
+    private static int RemoveOptionalZiaBgmObjects(Scene scene)
     {
         HashSet<GameObject> objectsToRemove = new HashSet<GameObject>();
         GameObject[] roots = scene.GetRootGameObjects();
@@ -659,7 +1044,7 @@ public static class BuildGuest1HotelHallMap
 
         if (objectsToRemove.Count == 0)
         {
-            return false;
+            return 0;
         }
 
         List<GameObject> filteredObjects = new List<GameObject>(objectsToRemove);
@@ -673,7 +1058,7 @@ public static class BuildGuest1HotelHallMap
             Undo.DestroyObjectImmediate(filteredObjects[i]);
         }
 
-        return true;
+        return filteredObjects.Count;
     }
 
     private static bool IsOptionalZiaBgmObject(GameObject gameObject)
@@ -697,6 +1082,22 @@ public static class BuildGuest1HotelHallMap
 
         PrefabInstanceStatus prefabStatus = PrefabUtility.GetPrefabInstanceStatus(gameObject);
         return prefabStatus == PrefabInstanceStatus.MissingAsset && lowerName.Contains("bgm");
+    }
+
+    private static bool IsOptionalZiaBgmObjectOrChild(GameObject gameObject)
+    {
+        Transform current = gameObject != null ? gameObject.transform : null;
+        while (current != null)
+        {
+            if (IsOptionalZiaBgmObject(current.gameObject))
+            {
+                return true;
+            }
+
+            current = current.parent;
+        }
+
+        return false;
     }
 
     private static bool HasRemovableAncestor(GameObject candidate, HashSet<GameObject> objectsToRemove)
@@ -1182,10 +1583,28 @@ public static class BuildGuest1HotelHallMap
                 continue;
             }
 
+            if (IsObsoleteZiaBuildScene(currentScenes[i].path))
+            {
+                continue;
+            }
+
             orderedScenes.Add(currentScenes[i]);
         }
 
         EditorBuildSettings.scenes = orderedScenes.ToArray();
+    }
+
+    private static bool IsObsoleteZiaBuildScene(string scenePath)
+    {
+        if (string.IsNullOrWhiteSpace(scenePath))
+        {
+            return false;
+        }
+
+        string sceneName = Path.GetFileNameWithoutExtension(scenePath);
+        return sceneName.StartsWith("Pov1_Guest3_Guide_", System.StringComparison.Ordinal) ||
+            (sceneName.StartsWith("Guest3_Final", System.StringComparison.Ordinal) &&
+             scenePath != ZiaFinalChaseScenePath);
     }
 
     private static Scene OpenOrCreateScene(string scenePath)
@@ -1823,6 +2242,11 @@ public static class BuildGuest1HotelHallMap
     {
         for (int i = 0; i < RequiredSpritePaths.Length; i++)
         {
+            if (ExactImportedZiaSpritePaths.Contains(RequiredSpritePaths[i]))
+            {
+                continue;
+            }
+
             TextureImporter importer = AssetImporter.GetAtPath(RequiredSpritePaths[i]) as TextureImporter;
             if (importer == null)
             {

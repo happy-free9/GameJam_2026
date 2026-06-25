@@ -317,7 +317,6 @@ MonoBehaviour:
   ownerDialogue: "Hotel Owner:\n\u201CThere we are. Safe and sound.\u201D"
   dialogueDelayAfterGuestDisappears: 0.15
   dialogueDisplaySeconds: 2.5
-  fadeToBlackAfterDialogue: 0
   blackFadeSeconds: 0.75
 --- !u!1 &2100
 GameObject:
@@ -400,12 +399,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 10
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: b03e486445ec2674d93e56ad9e85298e, type: 3}
+  m_Sprite: {fileID: -1827503611128410978, guid: a8f11dc35b6f94c668e9d279c0a891c1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1.3333334, y: 1.7777778}
+  m_Size: {x: 0.27, y: 0.52}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -1254,12 +1253,12 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 21300000, guid: 7f269456475465d468af9fe91afba576, type: 3}
+  m_Sprite: {fileID: 1982711446728729104, guid: a9b79214accdb4492acaa4daa18ed1c6, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 17.777779, y: 10}
+  m_Size: {x: 3.2, y: 1.8}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
