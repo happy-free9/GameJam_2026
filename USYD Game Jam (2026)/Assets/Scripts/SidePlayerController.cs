@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class SidePlayerController : MonoBehaviour
@@ -25,16 +26,22 @@ public class SidePlayerController : MonoBehaviour
         float x = 0f;
         float y = 0f;
 
-        if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed)
+        Keyboard keyboard = Keyboard.current;
+
+        if (IsPressed(keyboard, HotelHungerRuntimeManager.GetMovementBinding(HotelHungerRuntimeManager.MovementDirection.Left)) ||
+            keyboard.leftArrowKey.isPressed)
             x -= 1f;
 
-        if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed)
+        if (IsPressed(keyboard, HotelHungerRuntimeManager.GetMovementBinding(HotelHungerRuntimeManager.MovementDirection.Right)) ||
+            keyboard.rightArrowKey.isPressed)
             x += 1f;
 
-        if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed)
+        if (IsPressed(keyboard, HotelHungerRuntimeManager.GetMovementBinding(HotelHungerRuntimeManager.MovementDirection.Up)) ||
+            keyboard.upArrowKey.isPressed)
             y += 1f;
 
-        if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed)
+        if (IsPressed(keyboard, HotelHungerRuntimeManager.GetMovementBinding(HotelHungerRuntimeManager.MovementDirection.Down)) ||
+            keyboard.downArrowKey.isPressed)
             y -= 1f;
 
         moveInput = new Vector2(x, y).normalized;
@@ -43,5 +50,16 @@ public class SidePlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         rb.linearVelocity = moveInput * moveSpeed;
+    }
+
+    private static bool IsPressed(Keyboard keyboard, Key key)
+    {
+        if (keyboard == null || key == Key.None)
+        {
+            return false;
+        }
+
+        KeyControl control = keyboard[key];
+        return control != null && control.isPressed;
     }
 }
