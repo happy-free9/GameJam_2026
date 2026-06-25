@@ -317,6 +317,7 @@ MonoBehaviour:
   ownerDialogue: "Hotel Owner:\n\u201CThere we are. Safe and sound.\u201D"
   dialogueDelayAfterGuestDisappears: 0.15
   dialogueDisplaySeconds: 2.5
+  fadeToBlackAfterDialogue: 0
   blackFadeSeconds: 0.75
 --- !u!1 &2100
 GameObject:
@@ -344,7 +345,7 @@ Transform:
   m_GameObject: {fileID: 2100}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -4.5, z: 0}
+  m_LocalPosition: {x: 0, y: -4.46, z: 0}
   m_LocalScale: {x: 5, y: 5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
