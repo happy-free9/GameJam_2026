@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/MainMenu_XW.unity
+    guid: ea94f199da80db74e98adf2c53d85982
+  - enabled: 1
     path: Assets/Scenes/HotelLobby_XW.unity
     guid: ccdf3ba6d4968264a83da6780452e842
   - enabled: 1
