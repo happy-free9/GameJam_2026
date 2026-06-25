@@ -272,8 +272,10 @@ MonoBehaviour:
   arriveDistance: 0.08
   plantClickPadding: 0.25
   resetDelay: 0.8
+  interactSfx: {fileID: 8300000, guid: 55e01826203ab48b38b33e26d8d3c667, type: 3}
+  interactSfxVolume: 1.8
   failureSceneName: Pov1_Guest3_Guide_Task1_WetFloorSign
-  successSceneName: Pov1_Guest3_Guide_Task2_LuggageCart
+  successSceneName: Pov1_Guest3_Guide_Task3_LuggageCart
 --- !u!1 &2100
 GameObject:
   m_ObjectHideFlags: 0

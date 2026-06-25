@@ -39,6 +39,12 @@ public class Pov1Guest3GuideTask1WetFloorSignController : MonoBehaviour
     [SerializeField] private float wetFloorSignClickPadding = 0.25f;
     [SerializeField] private float resetDelay = 0.8f;
 
+    [Header("Audio")]
+    [Tooltip("Played once when the player successfully clicks the wet-floor sign.")]
+    [SerializeField] private AudioClip interactSfx;
+    [Range(0f, 2f)]
+    [SerializeField] private float interactSfxVolume = 1.8f;
+
     [Header("Success Transition")]
     [Tooltip("Scene loaded after Guest3 reaches the upper route end.")]
     [SerializeField] private string successSceneName = "Pov1_Guest3_Guide_Task2_PottedPlant";
@@ -51,6 +57,7 @@ public class Pov1Guest3GuideTask1WetFloorSignController : MonoBehaviour
     private bool hasCachedGuestStartPosition;
     private bool hasCachedWetFloorSignStartPosition;
     private bool hasWarnedMissingClickUnlockWall;
+    private AudioSource sfxAudioSource;
     private Coroutine resetRoutine;
 
     private void Start()
@@ -87,6 +94,7 @@ public class Pov1Guest3GuideTask1WetFloorSignController : MonoBehaviour
         if (TryClickWetFloorSignInTimingWindow())
         {
             state = OriginalRouteState.MovingWetFloorSign;
+            PlayInteractSfx();
             Debug.Log("Pov1 Guest3 Guide Task1: wet-floor sign clicked after Guest3 passed Wall_Left. Moving sign down.");
             return;
         }
@@ -295,6 +303,36 @@ public class Pov1Guest3GuideTask1WetFloorSignController : MonoBehaviour
         Bounds clickBounds = signRenderer.bounds;
         clickBounds.Expand(wetFloorSignClickPadding);
         return clickBounds.Contains(new Vector3(worldPoint.x, worldPoint.y, clickBounds.center.z));
+    }
+
+    private void PlayInteractSfx()
+    {
+        if (interactSfx == null)
+        {
+            return;
+        }
+
+        EnsureSfxAudioSource();
+        sfxAudioSource.PlayOneShot(interactSfx, interactSfxVolume);
+    }
+
+    private void EnsureSfxAudioSource()
+    {
+        if (sfxAudioSource != null)
+        {
+            return;
+        }
+
+        sfxAudioSource = GetComponent<AudioSource>();
+        if (sfxAudioSource == null)
+        {
+            sfxAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        sfxAudioSource.playOnAwake = false;
+        sfxAudioSource.loop = false;
+        sfxAudioSource.volume = 1f;
+        sfxAudioSource.spatialBlend = 0f;
     }
 
     private Vector3 GetRoute2EndPoint()

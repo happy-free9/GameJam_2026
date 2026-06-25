@@ -39,13 +39,19 @@ public class Pov1Guest3GuideTask2PottedPlantController : MonoBehaviour
     [SerializeField] private float plantClickPadding = 0.25f;
     [SerializeField] private float resetDelay = 0.8f;
 
+    [Header("Audio")]
+    [Tooltip("Played once when the player successfully clicks the potted plant.")]
+    [SerializeField] private AudioClip interactSfx;
+    [Range(0f, 2f)]
+    [SerializeField] private float interactSfxVolume = 1.8f;
+
     [Header("Failure Transition")]
     [Tooltip("Scene loaded when Guest3 reaches the left end without a successful plant click.")]
     [SerializeField] private string failureSceneName = "Pov1_Guest3_Guide_Task1_WetFloorSign";
 
     [Header("Success Transition")]
     [Tooltip("Scene loaded when Guest3 completes this chase after a successful plant click.")]
-    [SerializeField] private string successSceneName = "Pov1_Guest3_Guide_Task2_LuggageCart";
+    [SerializeField] private string successSceneName = "Pov1_Guest3_Guide_Task3_LuggageCart";
 
     private LayoutChaseState state = LayoutChaseState.RunningUpRoute1;
     private Vector3 guestStartPosition;
@@ -53,6 +59,7 @@ public class Pov1Guest3GuideTask2PottedPlantController : MonoBehaviour
     private bool hasCachedGuestStartPosition;
     private bool hasCachedPottedPlantStartPosition;
     private bool hasWarnedMissingClickUnlockWall;
+    private AudioSource sfxAudioSource;
     private Coroutine resetRoutine;
 
     private void Start()
@@ -103,6 +110,7 @@ public class Pov1Guest3GuideTask2PottedPlantController : MonoBehaviour
         if (TryClickPlantInTimingWindow())
         {
             state = LayoutChaseState.MovingPottedPlant;
+            PlayInteractSfx();
             Debug.Log("Pov1 Guest3 Guide Task2 PottedPlant: plant clicked after Guest3 passed Wall_Left top. Moving plant down.");
             return;
         }
@@ -338,6 +346,36 @@ public class Pov1Guest3GuideTask2PottedPlantController : MonoBehaviour
         Bounds clickBounds = plantRenderer.bounds;
         clickBounds.Expand(plantClickPadding);
         return clickBounds.Contains(new Vector3(worldPoint.x, worldPoint.y, clickBounds.center.z));
+    }
+
+    private void PlayInteractSfx()
+    {
+        if (interactSfx == null)
+        {
+            return;
+        }
+
+        EnsureSfxAudioSource();
+        sfxAudioSource.PlayOneShot(interactSfx, interactSfxVolume);
+    }
+
+    private void EnsureSfxAudioSource()
+    {
+        if (sfxAudioSource != null)
+        {
+            return;
+        }
+
+        sfxAudioSource = GetComponent<AudioSource>();
+        if (sfxAudioSource == null)
+        {
+            sfxAudioSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        sfxAudioSource.playOnAwake = false;
+        sfxAudioSource.loop = false;
+        sfxAudioSource.volume = 1f;
+        sfxAudioSource.spatialBlend = 0f;
     }
 
     private Vector3 GetRoute1TurnPoint()
