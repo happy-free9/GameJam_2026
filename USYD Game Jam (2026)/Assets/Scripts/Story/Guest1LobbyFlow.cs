@@ -15,6 +15,10 @@ public class Guest1LobbyFlow : MonoBehaviour
     [SerializeField] private InteractionTarget houseSpecialSyrupInteraction;
     [SerializeField] private InteractionTarget umbrellaInteraction;
 
+    [Header("Guest 1 Luggage")]
+    [SerializeField] private GameObject suitcaseVisual;
+    [SerializeField] private InteractionTarget suitcaseInteraction;
+
     [Header("Story Gates")]
     [SerializeField] private SceneTransitionTrigger elevatorTransition;
 
@@ -25,11 +29,19 @@ public class Guest1LobbyFlow : MonoBehaviour
     private bool hasUmbrella;
     private bool hasShownDrinkReadyMessage;
     private bool hasServedDrink;
+    private bool hasPickedUpSuitcase;
 
     private void Start()
     {
+        if (Guest1RunProgress.LobbyCompleted)
+        {
+            RestoreCompletedLobbyFlow();
+            return;
+        }
+
         SetObjective("Welcome the new guest.");
         SetTransitionEnabled(false);
+        SetSuitcaseAvailable(false);
     }
 
     public void InteractWithGuest()
@@ -50,8 +62,10 @@ public class Guest1LobbyFlow : MonoBehaviour
             ShowDialogue(
                 ("Guest 1", "I feel... really tired all of a sudden."),
                 ("You", "Wonderful! That means the hotel is already helping you relax."));
-            SetObjective("Take Guest 1 to the carts.");
+            SetObjective("Pick up Guest 1's luggage.");
             SetTransitionEnabled(true);
+            SetSuitcaseAvailable(true);
+            Guest1RunProgress.LobbyCompleted = true;
             return;
         }
 
@@ -61,7 +75,36 @@ public class Guest1LobbyFlow : MonoBehaviour
             return;
         }
 
-        ShowMessage("Take Guest 1 to the carts.");
+        if (Guest1RunProgress.DepartureCartChosen)
+        {
+            ShowMessage("Follow the luggage route through the elevator.");
+            return;
+        }
+
+        ShowMessage(Guest1RunProgress.SuitcaseCollected ?
+            "Take Guest 1's luggage to the Departure Cart." :
+            "Pick up Guest 1's luggage.");
+    }
+
+    public void PickUpGuest1Luggage()
+    {
+        if (!Guest1RunProgress.LobbyCompleted && !hasServedDrink)
+        {
+            ShowMessage("Serve Guest 1's welcome drink first.");
+            return;
+        }
+
+        if (hasPickedUpSuitcase || Guest1RunProgress.SuitcaseCollected)
+        {
+            ShowMessage("Guest 1's luggage is already with you.");
+            return;
+        }
+
+        hasPickedUpSuitcase = true;
+        Guest1RunProgress.SuitcaseCollected = true;
+        SetSuitcaseAvailable(false);
+        SetObjective("Take Guest 1's luggage to the Departure Cart.");
+        ShowMessage("You pick up Guest 1's luggage.");
     }
 
     public void CollectGlass()
@@ -129,6 +172,63 @@ public class Guest1LobbyFlow : MonoBehaviour
     private bool HasAllIngredients()
     {
         return hasGlass && hasGoldStraw && hasHouseSpecialSyrup && hasUmbrella;
+    }
+
+    private void RestoreCompletedLobbyFlow()
+    {
+        hasSpokenToGuest = true;
+        hasGlass = true;
+        hasGoldStraw = true;
+        hasHouseSpecialSyrup = true;
+        hasUmbrella = true;
+        hasShownDrinkReadyMessage = true;
+        hasServedDrink = true;
+        hasPickedUpSuitcase = Guest1RunProgress.SuitcaseCollected;
+
+        SetIngredientAvailable(glassVisual, glassInteraction, false);
+        SetIngredientAvailable(goldStrawVisual, goldStrawInteraction, false);
+        SetIngredientAvailable(houseSpecialSyrupVisual, houseSpecialSyrupInteraction, false);
+        SetIngredientAvailable(umbrellaVisual, umbrellaInteraction, false);
+
+        SetSuitcaseAvailable(!hasPickedUpSuitcase && !Guest1RunProgress.DepartureCartChosen);
+        if (Guest1RunProgress.DepartureCartChosen)
+        {
+            SetObjective("Follow the luggage route through the elevator.");
+        }
+        else
+        {
+            SetObjective(hasPickedUpSuitcase ?
+                "Take Guest 1's luggage to the Departure Cart." :
+                "Pick up Guest 1's luggage.");
+        }
+
+        SetTransitionEnabled(true);
+    }
+
+    private void SetSuitcaseAvailable(bool available)
+    {
+        if (suitcaseVisual != null)
+        {
+            suitcaseVisual.SetActive(available);
+        }
+
+        if (suitcaseInteraction != null)
+        {
+            suitcaseInteraction.enabled = available;
+        }
+    }
+
+    private void SetIngredientAvailable(GameObject visual, InteractionTarget interaction, bool available)
+    {
+        if (visual != null)
+        {
+            visual.SetActive(available);
+        }
+
+        if (interaction != null)
+        {
+            interaction.enabled = available;
+        }
     }
 
     private void SetTransitionEnabled(bool enabled)

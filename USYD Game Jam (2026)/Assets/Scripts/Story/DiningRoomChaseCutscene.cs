@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class DiningRoomChaseCutscene : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class DiningRoomChaseCutscene : MonoBehaviour
     [Header("Actors")]
     [SerializeField] private Transform guest2Actor;
     [SerializeField] private Transform staffActor;
+    [SerializeField] private GameObject staffExclamationObject;
 
     [Header("Routes")]
     [SerializeField] private Transform[] staffEntryWaypoints;
@@ -37,6 +39,7 @@ public class DiningRoomChaseCutscene : MonoBehaviour
 
     private void Start()
     {
+        SetStaffExclamationVisible(false);
         StartCutscene();
     }
 
@@ -47,6 +50,8 @@ public class DiningRoomChaseCutscene : MonoBehaviour
             StopCoroutine(runningRoutine);
             runningRoutine = null;
         }
+
+        SetStaffExclamationVisible(false);
     }
 
     public void Configure(
@@ -107,7 +112,9 @@ public class DiningRoomChaseCutscene : MonoBehaviour
         SetActorActive(guest2Actor, true);
 
         yield return MoveAlong(staffActor, staffEntryWaypoints, staffEntryDuration);
+        SetStaffExclamationVisible(true);
         yield return WaitForSecondsSafe(surprisePauseDuration);
+        SetStaffExclamationVisible(false);
 
         Coroutine guestRoutine = StartCoroutine(MoveAlongThenDeactivate(guest2Actor, guestRunWaypoints, guestRunDuration));
         yield return WaitForSecondsSafe(staffChaseDelay);
@@ -168,15 +175,46 @@ public class DiningRoomChaseCutscene : MonoBehaviour
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(nextSceneName) || string.IsNullOrWhiteSpace(nextSpawnId))
+        if (string.IsNullOrWhiteSpace(nextSceneName))
         {
             Debug.LogWarning(
-                "DiningRoomChaseCutscene was configured to load the next scene, but the scene name or spawn id is empty.",
+                "DiningRoomChaseCutscene was configured to load the next scene, but the scene name is empty.",
                 this);
             return;
         }
 
-        SceneTransitionManager.Instance?.LoadScene(nextSceneName, nextSpawnId);
+        if (!string.IsNullOrWhiteSpace(nextSpawnId))
+        {
+            if (SceneTransitionManager.Instance == null)
+            {
+                Debug.LogWarning(
+                    "DiningRoomChaseCutscene cannot use spawn-aware loading because SceneTransitionManager is unavailable.",
+                    this);
+                return;
+            }
+
+            SceneTransitionManager.Instance.LoadScene(nextSceneName, nextSpawnId);
+            return;
+        }
+
+        LoadSelfContainedScene(nextSceneName);
+    }
+
+    private void LoadSelfContainedScene(string sceneName)
+    {
+        if (HotelHungerRuntimeManager.Instance != null)
+        {
+            HotelHungerRuntimeManager.Instance.LoadSceneWithFade(sceneName);
+            return;
+        }
+
+        if (!Application.CanStreamedLevelBeLoaded(sceneName))
+        {
+            Debug.LogWarning($"DiningRoomChaseCutscene cannot load scene '{sceneName}' because it is not in Build Settings.", this);
+            return;
+        }
+
+        SceneManager.LoadScene(sceneName);
     }
 
     private bool HasRequiredReferences()
@@ -229,6 +267,14 @@ public class DiningRoomChaseCutscene : MonoBehaviour
         if (actor != null)
         {
             actor.gameObject.SetActive(isActive);
+        }
+    }
+
+    private void SetStaffExclamationVisible(bool isVisible)
+    {
+        if (staffExclamationObject != null)
+        {
+            staffExclamationObject.SetActive(isVisible);
         }
     }
 

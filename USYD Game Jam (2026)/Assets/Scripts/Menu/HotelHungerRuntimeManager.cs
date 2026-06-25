@@ -88,6 +88,7 @@ public sealed class HotelHungerRuntimeManager : MonoBehaviour
 
     public void StartNewGame()
     {
+        Guest1RunProgress.ClearAll();
         ClearCheckpoint();
         LoadSceneWithFade(StartSceneName);
     }
